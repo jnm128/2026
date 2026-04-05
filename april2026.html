@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=430px, initial-scale=1.0">
+  <title>Tappt Health - Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #c8cdd6;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 32px 0;
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+
+    /* ── Phone shell ── */
+    .phone {
+      width: 430px;
+      height: 932px;
+      background: #f8f8fd;
+      border-radius: 52px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.35);
+      flex-shrink: 0;
+    }
+
+    /* ── Status Bar ── */
+    .status-bar {
+      background: #ffffff;
+      height: 50px;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 0;
+    }
+    .status-bar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .status-time {
+      flex: 1;
+      font-family: -apple-system, 'SF Pro', sans-serif;
+      font-size: 17px;
+      font-weight: 590;
+      color: #000000;
+      text-align: center;
+      padding-left: 16px;
+      padding-right: 6px;
+      line-height: 22px;
+    }
+    .status-island { width: 124px; height: 10px; flex-shrink: 0; }
+    .status-icons {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+      padding-left: 6px;
+      padding-right: 16px;
+    }
+    .status-icons img { display: block; }
+
+    /* ── App Header ── */
+    .app-header {
+      background: #ffffff;
+      padding: 24px 16px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 8px; }
+    .logo-icon { width: 30px; height: 30px; display: block; }
+    .logo-wordmark { width: 89px; height: 30px; display: block; }
+    .avatar { width: 48px; height: 48px; display: block; }
+
+    /* ── Date / Week Strip ── */
+    .date-strip {
+      background: #ffffff;
+      padding: 0 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .date-label {
+      font-size: 18px;
+      font-weight: 400;
+      color: #757677;
+      line-height: 1.5;
+    }
+    .week-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .week-nav {
+      width: 40px;
+      height: 40px;
+      background: #f2f4f7;
+      border-radius: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .week-nav img { width: 20px; height: 20px; display: block; }
+    .week-nav.left { transform: rotate(180deg); }
+    .week-days { display: flex; gap: 8px; align-items: flex-end; }
+    .day-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 38px;
+    }
+    .day-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #757677;
+      text-align: center;
+      line-height: 14px;
+    }
+    .day-num {
+      width: 38px;
+      height: 38px;
+      border-radius: 27px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 600;
+      color: #757677;
+      position: relative;
+    }
+    .day-num.bordered-primary { border: 2px solid #002147; background: #ffffff; }
+    .day-num.bordered-gray    { border: 2px solid #d9d9d9; background: #ffffff; }
+    .day-num.active           { border: 2px solid #d9d9d9; background: #e2e7fb; }
+    .day-num.plain            { background: transparent; }
+
+    /* half-ring indicator on Tue (left half, gray) */
+    .day-num.bordered-gray .half-ring {
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-left-color: #d9d9d9;
+      pointer-events: none;
+    }
+    /* corner pip on Wed (top-right, tiny arc) */
+    .day-num.active .corner-pip {
+      position: absolute;
+      top: -2px;
+      left: 8px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d9d9d9;
+      pointer-events: none;
+    }
+
+    /* ── Scrollable Schedule Content ── */
+    .content-area {
+      position: absolute;
+      top: 288px;
+      left: 0;
+      right: 0;
+      bottom: 131px;
+      overflow-y: auto;
+      background: #f8f8fd;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .content-area::-webkit-scrollbar { display: none; }
+
+    /* ── Tap Counter Card ── */
+    .tap-card {
+      background: #e2e7fb;
+      border-radius: 12px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .tap-card-text { flex: 1; color: #1c1b1f; }
+    .tap-card-text h2 {
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 32px;
+      margin-bottom: 8px;
+    }
+    .tap-card-text p {
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+    .tap-card-text p .bold  { font-weight: 700; }
+    .tap-card-text p.extra  { font-weight: 600; }
+
+    /* ── Progress Circle ── */
+    .progress-wrap {
+      width: 91px;
+      height: 91px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .progress-wrap svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 91px; height: 91px;
+    }
+    .progress-num {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -44%);
+      font-size: 24px;
+      font-weight: 600;
+      color: #1f1933;
+      white-space: nowrap;
+    }
+
+    /* ── Section heading ── */
+    .section-heading {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1c1b1f;
+    }
+    .section-heading.primary { color: #002147; }
+
+    /* ── Time Slot ── */
+    .time-slot { display: flex; flex-direction: column; gap: 16px; }
+    .time-label {
+      font-size: 20px;
+      font-weight: 400;
+      color: #1c1b1f;
+      line-height: 18px;
+    }
+    .time-label.primary { font-weight: 600; color: #002147; }
+
+    /* ── Medication Card ── */
+    .med-card {
+      background: #ffffff;
+      border: 1px solid #ced2da;
+      border-radius: 12px;
+      box-shadow: 0px 6px 12px rgba(28,39,49,0.05);
+      padding: 16px;
+    }
+    .med-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .med-check {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      border-radius: 50%;
+    }
+    .med-check.empty {
+      border: 1px solid #ced2da;
+    }
+    .med-check img { width: 30px; height: 30px; display: block; }
+    .med-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+    .med-info { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .med-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1c1b1f;
+      line-height: 1.5;
+    }
+    .med-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 150px;
+      background: #e5f4ff;
+      width: fit-content;
+    }
+    .med-badge span {
+      font-size: 16px;
+      font-weight: 600;
+      color: #002147;
+      line-height: 20px;
+      white-space: nowrap;
+    }
+    .med-arrow { width: 20px; height: 20px; flex-shrink: 0; display: block; }
+
+    /* ── Bottom Nav Bar ── */
+    .nav-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 131px;
+    }
+    .nav-bar-bg {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 116px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      overflow: hidden;
+      padding-top: 4px;
+    }
+    .nav-tabs {
+      display: flex;
+      align-items: flex-start;
+      width: 100%;
+      padding: 16px 0;
+      flex: 1;
+    }
+    .nav-item {
+      flex: 1;
+      height: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+      gap: 0;
+    }
+    .nav-item img { width: 24px; height: 24px; display: block; }
+    .nav-item-label {
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 600;
+      color: #8f8d8d;
+      white-space: nowrap;
+      text-align: center;
+      line-height: 1.35;
+    }
+    .nav-item-label.active { color: #002147; }
+    .nav-spacer { width: 85px; flex-shrink: 0; }
+    .gesture-bar {
+      height: 32px;
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+    }
+    .gesture-pill {
+      width: 120px;
+      height: 4px;
+      background: #000000;
+      border-radius: 360px;
+    }
+
+    /* ── Center Action Button ── */
+    .action-btn {
+      position: absolute;
+      left: 159px;
+      top: -1px;
+      width: 96px;
+      height: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .action-btn-shadow {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255,110,97,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .action-btn-circle {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #ff7d72 0%, #ff6e61 60%, #e85a4d 100%);
+      box-shadow: 0 4px 14px rgba(255,110,97,0.55);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+    }
+    .action-btn-img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+    .action-btn-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-bar-row">
+        <div class="status-time">9:41</div>
+        <div class="status-island"></div>
+        <div class="status-icons">
+          <img src="https://www.figma.com/api/mcp/asset/2f700fc3-c8a8-427c-9901-a79506c18477" width="19" height="12" alt="">
+          <img src="https://www.figma.com/api/mcp/asset/6dcb34f4-0f4f-4d19-8e95-64b6e7987099" width="17" height="12" alt="">
+          <img src="https://www.figma.com/api/mcp/asset/fa1544c1-752e-4dda-8bf9-cfd8687ff328" width="27" height="13" alt="">
+        </div>
+      </div>
+    </div>
+
+    <!-- App Header -->
+    <div class="app-header">
+      <div class="logo">
+        <img class="logo-icon" src="https://www.figma.com/api/mcp/asset/c4f76250-2fb2-45ea-a033-0b6cce491dc2" alt="Tappt icon">
+        <img class="logo-wordmark" src="https://www.figma.com/api/mcp/asset/d92dcd8d-9c2a-4f4b-8868-b73910191e71" alt="tappt">
+      </div>
+      <img class="avatar" src="https://www.figma.com/api/mcp/asset/69389703-c634-43b7-a638-70a6a5444088" alt="Profile">
+    </div>
+
+    <!-- Date + Week Strip -->
+    <div class="date-strip">
+      <div class="date-label">Today, Feb 21st</div>
+      <div class="week-row">
+        <!-- Left arrow -->
+        <div class="week-nav left">
+          <img src="https://www.figma.com/api/mcp/asset/71d33032-cb4b-45f7-b38a-47a9d96d1fd7" alt="previous">
+        </div>
+
+        <div class="week-days">
+          <!-- Sun 18 - outlined primary -->
+          <div class="day-col">
+            <div class="day-name">Sun</div>
+            <div class="day-num bordered-primary">18</div>
+          </div>
+          <!-- Mon 19 - outlined primary -->
+          <div class="day-col">
+            <div class="day-name">Mon</div>
+            <div class="day-num bordered-primary">19</div>
+          </div>
+          <!-- Tue 20 - gray outlined -->
+          <div class="day-col">
+            <div class="day-name">Tue</div>
+            <div class="day-num bordered-gray">20</div>
+          </div>
+          <!-- Wed 21 - active (today) -->
+          <div class="day-col">
+            <div class="day-name">Wed</div>
+            <div class="day-num active">21</div>
+          </div>
+          <!-- Thu 22 -->
+          <div class="day-col">
+            <div class="day-name">Thu</div>
+            <div class="day-num bordered-gray">22</div>
+          </div>
+          <!-- Fri 23 -->
+          <div class="day-col">
+            <div class="day-name">Fri</div>
+            <div class="day-num plain">23</div>
+          </div>
+          <!-- Sat 24 -->
+          <div class="day-col">
+            <div class="day-name">Sat</div>
+            <div class="day-num plain">24</div>
+          </div>
+        </div>
+
+        <!-- Right arrow -->
+        <div class="week-nav">
+          <img src="https://www.figma.com/api/mcp/asset/71d33032-cb4b-45f7-b38a-47a9d96d1fd7" alt="next">
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="content-area">
+
+      <!-- Completed Taps Card -->
+      <div class="tap-card">
+        <div class="tap-card-text">
+          <h2>Completed Taps</h2>
+          <p>You've completed <span class="bold">4 of 5</span> scheduled Taps for this day.</p>
+          <p class="extra">+ 1 Tap out of schedule</p>
+        </div>
+        <!-- Progress Circle SVG -->
+        <div class="progress-wrap">
+          <svg viewBox="0 0 91 91" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Outer beige track -->
+            <circle cx="45.5" cy="45.5" r="41" stroke="#e8ddd0" stroke-width="8"/>
+            <!-- Progress arc 4/5 = 80% (clockwise from top) -->
+            <!-- circumference = 2π×41 ≈ 257.6 -->
+            <!-- dasharray = 257.6, offset = 257.6 × 0.20 ≈ 51.5 -->
+            <circle
+              cx="45.5" cy="45.5" r="41"
+              stroke="#2d1f4e"
+              stroke-width="8"
+              stroke-linecap="round"
+              stroke-dasharray="257.6"
+              stroke-dashoffset="51.5"
+              transform="rotate(-90 45.5 45.5)"
+            />
+            <!-- White inner fill -->
+            <circle cx="45.5" cy="45.5" r="33" fill="white"/>
+          </svg>
+          <div class="progress-num">4/5</div>
+        </div>
+      </div>
+
+      <!-- My Schedule Heading -->
+      <div class="section-heading">My Schedule</div>
+
+      <!-- 10:00 AM – Taken -->
+      <div class="time-slot">
+        <div class="time-label">10:00 AM</div>
+        <div class="med-card">
+          <div class="med-row">
+            <div class="med-check">
+              <img src="https://www.figma.com/api/mcp/asset/659c0e63-8d4a-47c3-bd98-aca9d1480877" alt="taken">
+            </div>
+            <div class="med-body">
+              <div class="med-info">
+                <div class="med-name">Nafronyl&nbsp; 200 MG</div>
+                <div class="med-badge"><span>Taken at 10:30 pm</span></div>
+              </div>
+              <img class="med-arrow" src="https://www.figma.com/api/mcp/asset/4c33fb45-8c8c-4833-8300-51de4ec10b9b" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11:00 AM – Upcoming -->
+      <div class="time-slot">
+        <div class="time-label">11:00 AM</div>
+        <div class="med-card">
+          <div class="med-row">
+            <div class="med-check empty"></div>
+            <div class="med-body">
+              <div class="med-info">
+                <div class="med-name">Nafronyl&nbsp; 200 MG</div>
+                <div class="med-badge"><span>Upcoming</span></div>
+              </div>
+              <img class="med-arrow" src="https://www.figma.com/api/mcp/asset/a3d3543d-5eab-4e3f-b3a6-65ad7e10a1ad" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 12:00 PM – Upcoming -->
+      <div class="time-slot">
+        <div class="time-label">12:00 PM</div>
+        <div class="med-card">
+          <div class="med-row">
+            <div class="med-check empty"></div>
+            <div class="med-body">
+              <div class="med-info">
+                <div class="med-name">Nafronyl&nbsp; 200 MG</div>
+                <div class="med-badge"><span>Upcoming</span></div>
+              </div>
+              <img class="med-arrow" src="https://www.figma.com/api/mcp/asset/a3d3543d-5eab-4e3f-b3a6-65ad7e10a1ad" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1:00 PM – Upcoming (primary color) -->
+      <div class="time-slot">
+        <div class="time-label primary">1:00 PM</div>
+        <div class="med-card">
+          <div class="med-row">
+            <div class="med-check empty"></div>
+            <div class="med-body">
+              <div class="med-info">
+                <div class="med-name">Nafronyl&nbsp; 200 MG</div>
+                <div class="med-badge"><span>Upcoming</span></div>
+              </div>
+              <img class="med-arrow" src="https://www.figma.com/api/mcp/asset/a3d3543d-5eab-4e3f-b3a6-65ad7e10a1ad" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Out of Schedule -->
+      <div class="section-heading primary">Out of Schedule</div>
+
+      <!-- 12:30 PM – Taken -->
+      <div class="time-slot">
+        <div class="time-label primary">12:30 PM</div>
+        <div class="med-card">
+          <div class="med-row">
+            <div class="med-check">
+              <img src="https://www.figma.com/api/mcp/asset/659c0e63-8d4a-47c3-bd98-aca9d1480877" alt="taken">
+            </div>
+            <div class="med-body">
+              <div class="med-info">
+                <div class="med-name">Nafronyl&nbsp; 200 MG</div>
+                <div class="med-badge"><span>Taken at 10:30 pm</span></div>
+              </div>
+              <img class="med-arrow" src="https://www.figma.com/api/mcp/asset/4c33fb45-8c8c-4833-8300-51de4ec10b9b" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content-area -->
+
+    <!-- Bottom Nav Bar -->
+    <div class="nav-bar">
+      <div class="nav-bar-bg">
+        <div class="nav-tabs">
+          <!-- Home (active) -->
+          <div class="nav-item">
+            <img src="https://www.figma.com/api/mcp/asset/1316d513-2de8-4ddd-a42e-e1df7f1c9855" alt="Home">
+            <span class="nav-item-label active">Home</span>
+          </div>
+          <!-- Care Plans -->
+          <div class="nav-item">
+            <img src="https://www.figma.com/api/mcp/asset/9afb3cc5-a875-47a5-9f90-c114c462329f" alt="Care Plans">
+            <span class="nav-item-label">Care Plans</span>
+          </div>
+          <!-- Center spacer for action button -->
+          <div class="nav-spacer"></div>
+          <!-- Check ins -->
+          <div class="nav-item">
+            <img src="https://www.figma.com/api/mcp/asset/a4f2014a-3063-413a-8dab-b50fc1a70d73" alt="Check ins">
+            <span class="nav-item-label">Check ins</span>
+          </div>
+          <!-- Resources -->
+          <div class="nav-item">
+            <img src="https://www.figma.com/api/mcp/asset/139caf1d-d5fa-4a87-9018-ffda31ffae8e" alt="Resources">
+            <span class="nav-item-label">Resources</span>
+          </div>
+        </div>
+        <div class="gesture-bar">
+          <div class="gesture-pill"></div>
+        </div>
+      </div>
+
+      <!-- Center Action Button -->
+      <div class="action-btn">
+        <div class="action-btn-shadow">
+          <div class="action-btn-circle">
+            <img class="action-btn-img" src="https://www.figma.com/api/mcp/asset/48e2f2cb-b05e-4262-a35d-a6b76f08bd0c" alt="tap">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end phone -->
+</body>
+</html>
